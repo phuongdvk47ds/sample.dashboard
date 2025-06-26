@@ -1,3 +1,4 @@
+python-dotenv
 matplotlib
 seaborn
 numpy
@@ -7,4 +8,5 @@ pyarrow
 fastparquet
 yfinance
 plotly
-Streamlit  
+Streamlit
+boto3
