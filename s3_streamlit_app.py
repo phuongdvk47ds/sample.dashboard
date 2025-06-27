@@ -249,7 +249,7 @@ def main():
     tickers = df['Ticker'].unique()
     
     # Streamlit
-    st.title(f"Candle Stick Chart Dashboard {' - Local cache' if handler.has_local_cache_file() else ' - New donwload S3'}")
+    st.title(f"S3 Candle Stick Chart Dashboard {' - Local cache' if handler.has_local_cache_file() else ' - New donwload S3'}")
 
     # Filter by ticker
     ticker = st.selectbox("Select Ticker", df['Ticker'].unique())
