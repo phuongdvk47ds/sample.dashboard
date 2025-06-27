@@ -21,6 +21,7 @@ class S3ParquetHandler:
         local_cache_dir = os.getenv('LOCAL_CACHE_DIR', '~/.s3_parquet_cache')
         self.local_cache_dir = os.path.expanduser(local_cache_dir)
         os.makedirs(self.local_cache_dir, exist_ok=True)
+        self._has_local_cache_file = True
 
     def _validate_env_vars(self):
         """Validate required environment variables"""
@@ -115,11 +116,15 @@ class S3ParquetHandler:
         with open(meta_path, 'r') as f:
             return json.load(f)
     
+    def has_local_cache_file(self):
+        return self._has_local_cache_file
+
     def download_from_s3(self, bucket_name, file_key, force_download=False):
         """
         Tải file từ S3 xuống local nếu có thay đổi hoặc chưa có
         Trả về đường dẫn file local
         """
+        self._has_local_cache_file = True
         local_path = self._get_local_cache_path(bucket_name, file_key)
         
         # Kiểm tra nếu cần tải lại file
@@ -129,6 +134,7 @@ class S3ParquetHandler:
                 return local_path
         
         print(f"Tải file mới từ S3: {bucket_name}/{file_key}")
+        self._has_local_cache_file = False
         try:
             # Tải file từ S3
             response = self.s3_client.get_object(Bucket=bucket_name, Key=file_key)
@@ -243,7 +249,8 @@ def main():
     tickers = df['Ticker'].unique()
     
     # Streamlit
-    st.title("Candle Stick Chart Dashboard")
+    st.title(f"Candle Stick Chart Dashboard {' - Local cache' if handler.has_local_cache_file() else ' - New donwload S3'}")
+
     # Filter by ticker
     ticker = st.selectbox("Select Ticker", df['Ticker'].unique())
     df_ticker = df[df['Ticker'] == ticker]
